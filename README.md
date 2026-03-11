@@ -4,7 +4,7 @@ An MCP server that gives LLMs the ability to see and control a Windows desktop v
 
 ## How It Works
 
-The server provides tools — the LLM client (Claude) does all the reasoning:
+The server provides tools — the LLM client does all the reasoning:
 
 1. **Screenshot** the desktop to see what's on screen
 2. **Identify** UI elements via vision or Windows UI Automation
@@ -26,9 +26,11 @@ cd Desktop-Control-MCP
 pip install -e .
 ```
 
-### Register with Claude Desktop
+### Register with an MCP Client
 
-Add to `%APPDATA%\Claude\claude_desktop_config.json`:
+Add the server to your MCP client's configuration. Examples for popular clients:
+
+**Claude Desktop** — `%APPDATA%\Claude\claude_desktop_config.json`:
 
 ```json
 {
@@ -42,7 +44,38 @@ Add to `%APPDATA%\Claude\claude_desktop_config.json`:
 }
 ```
 
-Then restart Claude Desktop.
+**Claude Code** — `.claude/settings.json` or via `claude mcp add`:
+
+```bash
+claude mcp add desktop-control -- python -m desktop_control.server
+```
+
+**Cursor** — `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "desktop-control": {
+      "command": "python",
+      "args": ["-m", "desktop_control.server"]
+    }
+  }
+}
+```
+
+**OpenAI Agents SDK** — via Python:
+
+```python
+from agents import Agent
+from agents.mcp import MCPServerStdio
+
+server = MCPServerStdio(command="python", args=["-m", "desktop_control.server"])
+agent = Agent(name="desktop", tools=server.tools())
+```
+
+Any MCP-compatible client (Windsurf, Cline, Continue, etc.) can connect using the standard stdio transport with `python -m desktop_control.server`.
+
+Then restart your client.
 
 ## Tools (12)
 
@@ -125,9 +158,9 @@ Electron apps (Discord, VS Code, Slack, etc.) expose limited UIA elements. For f
 
 ## Example Usage
 
-From Claude Desktop (after registering the MCP server):
+From any MCP client (after registering the server):
 
-> "Open Discord and join the General voice channel on the rick_ server"
+> "Open Discord and join the General voice channel"
 
 The LLM will:
 1. `open_application("Discord")` or click the taskbar icon
