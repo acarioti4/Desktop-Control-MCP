@@ -1,0 +1,24 @@
+[project]
+name = "desktop-control-mcp"
+version = "0.1.0"
+description = "MCP server for LLM-driven Windows desktop control via mouse, keyboard, and UI Automation"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.2.0",
+    "pyautogui>=0.9.54",
+    "Pillow>=10.0.0",
+    "mss>=9.0.0",
+    "comtypes>=1.4.0",
+    "websockets>=12.0",
+    "aiohttp>=3.9.0",
+]
+
+[project.scripts]
+desktop-control-mcp = "desktop_control.server:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
